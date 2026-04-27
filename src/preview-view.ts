@@ -1,4 +1,4 @@
-import { ItemView, TAbstractFile, WorkspaceLeaf } from 'obsidian';
+import { EventRef, ItemView, TAbstractFile, WorkspaceLeaf } from 'obsidian';
 import { createRoot, Root } from 'react-dom/client';
 import React from 'react';
 import PreviewPanel from './components/PreviewPanel';
@@ -11,6 +11,7 @@ export const VIEW_TYPE_TEXTUI = 'textui-preview';
 export class TextUIPreviewView extends ItemView {
   private root: Root | null = null;
   private readonly plugin: TextUIDesignerPlugin;
+  private modifyEventRef: EventRef | null = null;
 
   constructor(leaf: WorkspaceLeaf, plugin: TextUIDesignerPlugin) {
     super(leaf);
@@ -25,16 +26,18 @@ export class TextUIPreviewView extends ItemView {
     container.empty();
     this.root = createRoot(container);
     await this.renderPreview();
-    this.registerEvent(
-      this.app.vault.on('modify', (file: TAbstractFile) => {
-        if (file.path === this.plugin.settings.defaultDslPath) {
-          void this.renderPreview();
-        }
-      })
-    );
+    this.modifyEventRef = this.app.vault.on('modify', (file: TAbstractFile) => {
+      if (file.path === this.plugin.settings.defaultDslPath) {
+        void this.renderPreview();
+      }
+    });
   }
 
   async onClose(): Promise<void> {
+    if (this.modifyEventRef) {
+      this.app.vault.offref(this.modifyEventRef);
+      this.modifyEventRef = null;
+    }
     if (this.root) {
       this.root.unmount();
       this.root = null;
