@@ -11,6 +11,7 @@ const context = await esbuild.context({
   external: ["obsidian", "electron", "@codemirror/*", "@lezer/*", ...builtins],
   format: "cjs",
   target: "es2018",
+  jsx: "automatic",
   logLevel: "info",
   sourcemap: prod ? false : "inline",
   treeShaking: true,

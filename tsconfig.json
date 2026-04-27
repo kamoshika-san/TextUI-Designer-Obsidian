@@ -11,9 +11,11 @@
     "isolatedModules": true,
     "strictNullChecks": true,
     "lib": ["ES6", "DOM"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "paths": {
       "textui-designer/*": ["../TextUI-Designer/src/*"]
     }
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }
