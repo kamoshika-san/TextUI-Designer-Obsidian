@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 import { TextUIPreviewView, VIEW_TYPE_TEXTUI } from './preview-view';
 import { TextUISettingTab, DEFAULT_SETTINGS, PluginSettings } from './settings';
 
@@ -7,7 +7,7 @@ export default class TextUIDesignerPlugin extends Plugin {
 
   async onload() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-    this.registerView(VIEW_TYPE_TEXTUI, (leaf) => new TextUIPreviewView(leaf));
+    this.registerView(VIEW_TYPE_TEXTUI, (leaf) => new TextUIPreviewView(leaf, this));
     this.addCommand({
       id: 'open-textui-preview',
       name: 'Open TextUI Preview',
@@ -15,6 +15,13 @@ export default class TextUIDesignerPlugin extends Plugin {
     });
     this.addRibbonIcon('layout', 'TextUI Preview', () => this.activateView());
     this.addSettingTab(new TextUISettingTab(this.app, this));
+    this.registerEvent(
+      this.app.workspace.on('file-open', (file: TFile | null) => {
+        if (file && (file.path.endsWith('.tui.yml') || file.path.endsWith('.tui.yaml'))) {
+          void this.activateView();
+        }
+      })
+    );
   }
 
   onunload() {
