@@ -11,7 +11,6 @@ export const VIEW_TYPE_TEXTUI = 'textui-preview';
 export class TextUIPreviewView extends ItemView {
   private root: Root | null = null;
   private readonly plugin: TextUIDesignerPlugin;
-  private modifyHandler: ((file: TAbstractFile) => void) | null = null;
 
   constructor(leaf: WorkspaceLeaf, plugin: TextUIDesignerPlugin) {
     super(leaf);
@@ -26,19 +25,16 @@ export class TextUIPreviewView extends ItemView {
     container.empty();
     this.root = createRoot(container);
     await this.renderPreview();
-    this.modifyHandler = (file: TAbstractFile) => {
-      if (file.path === this.plugin.settings.defaultDslPath) {
-        void this.renderPreview();
-      }
-    };
-    this.app.vault.on('modify', this.modifyHandler);
+    this.registerEvent(
+      this.app.vault.on('modify', (file: TAbstractFile) => {
+        if (file.path === this.plugin.settings.defaultDslPath) {
+          void this.renderPreview();
+        }
+      })
+    );
   }
 
   async onClose(): Promise<void> {
-    if (this.modifyHandler) {
-      this.app.vault.off('modify', this.modifyHandler);
-      this.modifyHandler = null;
-    }
     if (this.root) {
       this.root.unmount();
       this.root = null;
