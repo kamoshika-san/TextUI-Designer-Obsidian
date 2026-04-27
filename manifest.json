@@ -1,0 +1,9 @@
+{
+  "id": "textui-obsidian",
+  "name": "TextUI Designer",
+  "version": "0.1.0",
+  "minAppVersion": "1.0.0",
+  "description": "TextUI DSL preview and export for Obsidian",
+  "author": "kamoshika-san",
+  "isDesktopOnly": true
+}
