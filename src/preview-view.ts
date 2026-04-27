@@ -51,25 +51,18 @@ export class TextUIPreviewView extends ItemView {
 
     const path = this.plugin.settings.defaultDslPath;
     if (!path) {
-      this.root.render(React.createElement(PreviewPanel, { error: 'No DSL path configured' }));
+      this.root.render(
+        React.createElement(PreviewPanel, { result: { error: 'No DSL path configured' } })
+      );
       return;
     }
 
     try {
       const dslContent = await readDslFile(this.app.vault, path);
       const parseResult = parseDsl(dslContent);
-      if ('error' in parseResult) {
-        this.root.render(React.createElement(PreviewPanel, { error: parseResult.error }));
-        return;
-      }
-
-      this.root.render(
-        React.createElement(PreviewPanel, {
-          dslContent: JSON.stringify(parseResult.dsl, null, 2),
-        })
-      );
+      this.root.render(React.createElement(PreviewPanel, { result: parseResult }));
     } catch (error) {
-      this.root.render(React.createElement(PreviewPanel, { error: String(error) }));
+      this.root.render(React.createElement(PreviewPanel, { result: { error: String(error) } }));
     }
   }
 }

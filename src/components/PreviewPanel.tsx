@@ -1,16 +1,25 @@
 import React from 'react';
+import type { ParseResult } from '../core-adapter';
 
 interface Props {
-  dslContent?: string;
-  error?: string;
+  result?: ParseResult;
 }
 
-export default function PreviewPanel({ dslContent, error }: Props): React.ReactElement {
-  if (error !== undefined) {
-    return <div style={{ color: 'red' }}>{error}</div>;
-  }
-  if (dslContent === undefined) {
+export default function PreviewPanel({ result }: Props): React.ReactElement {
+  if (result === undefined) {
     return <div>Loading...</div>;
   }
-  return <pre>{dslContent}</pre>;
+  if ('error' in result) {
+    return <div style={{ color: 'red' }}>{result.error}</div>;
+  }
+  if (!('page' in result.dsl)) {
+    return <div>Navigation Flow DSL</div>;
+  }
+
+  return (
+    <section>
+      <h2>{result.dsl.page.title}</h2>
+      <div>Page ID: {result.dsl.page.id}</div>
+    </section>
+  );
 }
